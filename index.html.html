@@ -1,0 +1,364 @@
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);min-height:100vh}
+.header{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-size:22px;font-weight:500;color:#1aaf5d}
+.logo span{color:var(--color-text-primary)}
+.lang-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);padding:6px 12px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;font-family:var(--font-sans)}
+.tabs{display:flex;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.tab{flex:1;padding:12px 4px;text-align:center;cursor:pointer;font-size:11px;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:all 0.2s}
+.tab.active{color:#1aaf5d;border-bottom-color:#1aaf5d;background:var(--color-background-secondary)}
+.tab-icon{font-size:18px;display:block;margin-bottom:2px}
+.content{display:none;padding:16px;max-width:480px;margin:0 auto}
+.content.active{display:block}
+.section-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:#1aaf5d;margin-bottom:12px;opacity:0.8}
+.camera-box{background:var(--color-background-primary);border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:32px 16px;text-align:center;cursor:pointer;transition:all 0.2s;display:block;width:100%}
+.camera-box:hover{border-color:#1aaf5d;background:var(--color-background-secondary)}
+.camera-box .big-icon{font-size:52px;margin-bottom:12px}
+.camera-box h2{font-size:17px;font-weight:500;margin-bottom:6px;color:var(--color-text-primary)}
+.camera-box p{color:var(--color-text-secondary);font-size:13px;line-height:1.5}
+#fileInput{display:none}
+.preview-img{width:100%;border-radius:var(--border-radius-lg);margin-bottom:12px;display:none;max-height:280px;object-fit:cover}
+.analyze-btn{width:100%;background:#1aaf5d;color:#fff;border:none;padding:14px;border-radius:var(--border-radius-lg);font-size:16px;font-weight:500;cursor:pointer;margin-top:12px;display:none;font-family:var(--font-sans)}
+.analyze-btn:hover{background:#158f4a}
+.loading{text-align:center;padding:24px;display:none}
+.spinner{width:40px;height:40px;border:3px solid var(--color-border-tertiary);border-top-color:#1aaf5d;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:20px;margin-top:12px;display:none;border:0.5px solid var(--color-border-tertiary);animation:slideUp 0.3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.result-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.result-icon{font-size:42px}
+.result-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.result-sub{color:var(--color-text-secondary);font-size:12px;margin-top:2px}
+.bin-tag{display:inline-block;padding:5px 12px;border-radius:var(--border-radius-md);font-size:12px;font-weight:500;margin:3px}
+.bin-green{background:var(--color-background-success);color:var(--color-text-success)}
+.bin-blue{background:var(--color-background-info);color:var(--color-text-info)}
+.bin-yellow{background:var(--color-background-warning);color:var(--color-text-warning)}
+.bin-red{background:var(--color-background-danger);color:var(--color-text-danger)}
+.tip-box{background:var(--color-background-secondary);border-left:3px solid #1aaf5d;padding:10px 14px;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;margin-top:14px;font-size:13px;line-height:1.6;color:var(--color-text-secondary)}
+.search-input{width:100%;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:12px 16px;font-size:15px;color:var(--color-text-primary);font-family:var(--font-sans);outline:none;margin-bottom:12px}
+.search-input:focus{border-color:#1aaf5d}
+.quick-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-pill{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-sans)}
+.cat-pill.active{background:var(--color-background-success);border-color:#1aaf5d;color:var(--color-text-success)}
+.waste-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px}
+.waste-card:hover{border-color:var(--color-border-secondary);background:var(--color-background-secondary)}
+.waste-emoji{font-size:28px;flex-shrink:0}
+.waste-info h3{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.waste-info p{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.map-placeholder{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:24px;text-align:center;border:0.5px solid var(--color-border-tertiary)}
+.location-btn{background:#185FA5;color:white;border:none;padding:12px 24px;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;margin-top:14px;font-family:var(--font-sans)}
+.map-item{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border:0.5px solid var(--color-border-tertiary)}
+.map-dot{width:40px;height:40px;border-radius:50%;background:var(--color-background-success);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.map-info h3{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.map-info p{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.dist-badge{margin-left:auto;background:var(--color-background-secondary);color:var(--color-text-secondary);font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--border-radius-md);flex-shrink:0}
+.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.guide-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:14px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all 0.2s}
+.guide-card:hover{border-color:var(--color-border-secondary);transform:translateY(-2px)}
+.guide-card .gicon{font-size:24px;margin-bottom:6px}
+.guide-card h3{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.guide-card p{font-size:11px;color:var(--color-text-secondary);margin-top:3px;line-height:1.5}
+.penalty-box{background:var(--color-background-danger);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.penalty-box h3{color:var(--color-text-danger);font-size:14px;font-weight:500;margin-bottom:10px}
+.penalty-item{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;color:var(--color-text-primary)}
+.penalty-item:last-child{border-bottom:none}
+.penalty-amt{color:var(--color-text-danger);font-weight:500}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:50;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--color-background-primary);border-radius:16px 16px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp 0.3s ease}
+.modal-handle{width:32px;height:3px;background:var(--color-border-secondary);border-radius:2px;margin:0 auto 16px}
+.modal h2{font-size:18px;font-weight:500;margin-bottom:14px;color:var(--color-text-primary)}
+.modal-close{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);padding:10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:14px;margin-top:14px;width:100%;font-family:var(--font-sans)}
+.modal-tip{background:var(--color-background-secondary);border-left:3px solid #1aaf5d;padding:10px 14px;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;font-size:13px;line-height:1.6;color:var(--color-text-secondary);margin-bottom:10px}
+.error-box{background:var(--color-background-danger);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-top:12px;font-size:13px;color:var(--color-text-danger);display:none}
+</style>
+
+<div class="header">
+  <div class="logo">분리<span>GO</span></div>
+  <button class="lang-btn" id="langBtn" onclick="toggleLang()">🇻🇳 Tiếng Việt</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('camera',this)">
+    <span class="tab-icon">📷</span>
+    <span class="t-txt" data-ko="사진분석" data-vi="Chụp ảnh">사진분석</span>
+  </div>
+  <div class="tab" onclick="switchTab('search',this)">
+    <span class="tab-icon">🔍</span>
+    <span class="t-txt" data-ko="검색" data-vi="Tìm kiếm">검색</span>
+  </div>
+  <div class="tab" onclick="switchTab('map',this)">
+    <span class="tab-icon">📍</span>
+    <span class="t-txt" data-ko="수거함" data-vi="Bản đồ">수거함</span>
+  </div>
+  <div class="tab" onclick="switchTab('guide',this)">
+    <span class="tab-icon">📖</span>
+    <span class="t-txt" data-ko="가이드" data-vi="Hướng dẫn">가이드</span>
+  </div>
+</div>
+
+<div id="tab-camera" class="content active">
+  <p class="section-label t-txt" data-ko="AI 쓰레기 분석" data-vi="PHÂN TÍCH RÁC AI">AI 쓰레기 분석</p>
+  <label for="fileInput" class="camera-box">
+    <div class="big-icon">📸</div>
+    <h2 class="t-txt" data-ko="사진을 찍거나 업로드하세요" data-vi="Chụp ảnh hoặc tải lên">사진을 찍거나 업로드하세요</h2>
+    <p class="t-txt" data-ko="AI가 쓰레기를 자동으로 분류해 드려요" data-vi="AI tự động phân loại rác cho bạn">AI가 쓰레기를 자동으로 분류해 드려요</p>
+  </label>
+  <input type="file" id="fileInput" accept="image/*" onchange="handleImage(this)">
+  <img id="previewImg" class="preview-img">
+  <button class="analyze-btn" id="analyzeBtn" onclick="analyzeWaste()">
+    🔍 <span class="t-txt" data-ko="AI 분석 시작" data-vi="Bắt đầu phân tích">AI 분석 시작</span>
+  </button>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p class="t-txt" style="color:var(--color-text-secondary);font-size:14px" data-ko="AI가 분석 중입니다..." data-vi="AI đang phân tích...">AI가 분석 중입니다...</p>
+  </div>
+  <div class="error-box" id="errorBox"></div>
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <div class="result-icon" id="rIcon">♻️</div>
+      <div>
+        <div class="result-title" id="rTitle"></div>
+        <div class="result-sub" id="rSub"></div>
+      </div>
+    </div>
+    <div id="rBins"></div>
+    <div class="tip-box" id="rTip"></div>
+  </div>
+</div>
+
+<div id="tab-search" class="content">
+  <p class="section-label t-txt" data-ko="쓰레기 종류 검색" data-vi="TÌM KIẾM LOẠI RÁC">쓰레기 종류 검색</p>
+  <input type="text" class="search-input" id="searchInput" placeholder="예: 페트병, 음식물..." oninput="searchWaste(this.value)">
+  <div class="quick-cats">
+    <span class="cat-pill active" onclick="filterCat('all',this)">전체</span>
+    <span class="cat-pill" onclick="filterCat('재활용',this)">♻️ 재활용</span>
+    <span class="cat-pill" onclick="filterCat('음식물',this)">🍃 음식물</span>
+    <span class="cat-pill" onclick="filterCat('일반',this)">🗑️ 일반</span>
+    <span class="cat-pill" onclick="filterCat('종량제',this)">🛍️ 종량제</span>
+  </div>
+  <div id="searchResults"></div>
+</div>
+
+<div id="tab-map" class="content">
+  <p class="section-label t-txt" data-ko="근처 수거함 찾기" data-vi="TÌM ĐIỂM THU GOM">근처 수거함 찾기</p>
+  <div class="map-placeholder">
+    <div style="font-size:40px;margin-bottom:10px">📍</div>
+    <p style="color:var(--color-text-secondary);font-size:14px" class="t-txt" data-ko="위치를 허용하면 가까운 수거함을 찾아드려요" data-vi="Cho phép vị trí để tìm điểm thu gom gần nhất">위치를 허용하면 가까운 수거함을 찾아드려요</p>
+    <button class="location-btn" onclick="findNearby()">
+      📍 <span class="t-txt" data-ko="내 위치 찾기" data-vi="Tìm vị trí của tôi">내 위치 찾기</span>
+    </button>
+  </div>
+  <div id="mapList" style="margin-top:16px"></div>
+</div>
+
+<div id="tab-guide" class="content">
+  <p class="section-label t-txt" data-ko="분리수거 가이드" data-vi="HƯỚNG DẪN PHÂN LOẠI">분리수거 가이드</p>
+  <div style="font-size:15px;font-weight:500;margin-bottom:12px;color:var(--color-text-primary)">🗑️ <span class="t-txt" data-ko="쓰레기 종류별 방법" data-vi="Cách phân loại theo từng loại">쓰레기 종류별 방법</span></div>
+  <div class="guide-grid">
+    <div class="guide-card" onclick="showModal('종량제')"><div class="gicon">🛍️</div><h3 class="t-txt" data-ko="종량제 봉투" data-vi="Túi rác có phí">종량제 봉투</h3><p class="t-txt" data-ko="일반 쓰레기, 유료 봉투" data-vi="Rác thông thường">일반 쓰레기</p></div>
+    <div class="guide-card" onclick="showModal('음식물')"><div class="gicon">🍃</div><h3 class="t-txt" data-ko="음식물 쓰레기" data-vi="Rác thực phẩm">음식물 쓰레기</h3><p class="t-txt" data-ko="전용 용기 사용" data-vi="Dùng thùng riêng">전용 용기 사용</p></div>
+    <div class="guide-card" onclick="showModal('플라스틱')"><div class="gicon">🧴</div><h3 class="t-txt" data-ko="플라스틱" data-vi="Nhựa">플라스틱</h3><p class="t-txt" data-ko="세척 후 배출" data-vi="Rửa trước khi bỏ">세척 후 배출</p></div>
+    <div class="guide-card" onclick="showModal('종이')"><div class="gicon">📦</div><h3 class="t-txt" data-ko="종이/박스" data-vi="Giấy/Hộp">종이/박스</h3><p class="t-txt" data-ko="테이프 제거 후" data-vi="Tháo băng keo">테이프 제거 후</p></div>
+    <div class="guide-card" onclick="showModal('유리')"><div class="gicon">🍶</div><h3 class="t-txt" data-ko="유리" data-vi="Thủy tinh">유리</h3><p class="t-txt" data-ko="뚜껑 분리 세척" data-vi="Tháo nắp, rửa sạch">뚜껑 분리 세척</p></div>
+    <div class="guide-card" onclick="showModal('금속')"><div class="gicon">🥫</div><h3 class="t-txt" data-ko="금속/캔" data-vi="Kim loại/Lon">금속/캔</h3><p class="t-txt" data-ko="내용물 비우고 찌그러뜨려" data-vi="Đổ hết, ép bẹp">내용물 비워요</p></div>
+  </div>
+  <div style="font-size:15px;font-weight:500;margin-bottom:12px;color:var(--color-text-primary)">⚠️ <span class="t-txt" data-ko="과태료 안내" data-vi="Thông tin phạt tiền">과태료 안내</span></div>
+  <div class="penalty-box">
+    <h3>🚫 <span class="t-txt" data-ko="잘못 버리면 과태료!" data-vi="Bỏ sai sẽ bị phạt tiền!">잘못 버리면 과태료!</span></h3>
+    <div class="penalty-item"><span class="t-txt" data-ko="무단 투기" data-vi="Vứt rác bừa bãi">무단 투기</span><span class="penalty-amt">~100만원</span></div>
+    <div class="penalty-item"><span class="t-txt" data-ko="종량제 미사용" data-vi="Không dùng túi có phí">종량제 미사용</span><span class="penalty-amt">~30만원</span></div>
+    <div class="penalty-item"><span class="t-txt" data-ko="분리수거 위반" data-vi="Vi phạm phân loại">분리수거 위반</span><span class="penalty-amt">~10만원</span></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="modalTitle"></h2>
+    <div id="modalContent"></div>
+    <button class="modal-close" onclick="closeModal()">닫기 / Đóng</button>
+  </div>
+</div>
+
+<script>
+let lang = 'ko';
+let cat = 'all';
+
+const DB = [
+  {name:'페트병',vi:'Chai nhựa PET',e:'🧴',cat:'재활용',bin:'blue',binTxt:'플라스틱 분리수거함',tip:'뚜껑 분리, 세척 후 배출 | Tháo nắp, rửa sạch'},
+  {name:'음식물 쓰레기',vi:'Rác thực phẩm',e:'🍳',cat:'음식물',bin:'green',binTxt:'음식물 전용 수거함',tip:'물기 제거 후 배출 | Ráo nước trước khi bỏ'},
+  {name:'종이컵',vi:'Cốc giấy',e:'☕',cat:'재활용',bin:'blue',binTxt:'종이류 분리수거함',tip:'이물질 제거 후 배출 | Loại tạp chất trước'},
+  {name:'비닐봉지',vi:'Túi nilon',e:'🛍️',cat:'재활용',bin:'blue',binTxt:'비닐류 분리수거함',tip:'이물질 없는 것만 재활용 | Chỉ tái chế khi sạch'},
+  {name:'유리병',vi:'Chai thủy tinh',e:'🍶',cat:'재활용',bin:'yellow',binTxt:'유리 분리수거함',tip:'뚜껑 분리, 세척 후 배출 | Tháo nắp, rửa sạch'},
+  {name:'캔',vi:'Lon',e:'🥫',cat:'재활용',bin:'blue',binTxt:'금속 분리수거함',tip:'찌그러뜨려 부피 줄이기 | Ép bẹp để giảm thể tích'},
+  {name:'박스',vi:'Hộp carton',e:'📦',cat:'재활용',bin:'blue',binTxt:'종이류 분리수거함',tip:'테이프 제거, 납작하게 접기 | Tháo băng keo, gấp phẳng'},
+  {name:'음식 남은 것',vi:'Thức ăn thừa',e:'🍱',cat:'음식물',bin:'green',binTxt:'음식물 전용 수거함',tip:'전용 봉투/용기 사용 | Dùng túi chuyên dụng'},
+  {name:'옷/섬유',vi:'Quần áo/Vải',e:'👕',cat:'일반',bin:'red',binTxt:'헌옷 수거함/종량제',tip:'깨끗한 옷은 헌옷함 기증 | Quần áo sạch có thể tặng'},
+  {name:'스티로폼',vi:'Xốp',e:'📦',cat:'재활용',bin:'blue',binTxt:'스티로폼 수거함',tip:'이물질 제거 후 배출 | Loại tạp chất trước'},
+  {name:'건전지',vi:'Pin',e:'🔋',cat:'일반',bin:'red',binTxt:'폐건전지 수거함',tip:'마트/편의점 수거함 사용 | Thùng thu gom ở siêu thị'},
+  {name:'종량제 봉투',vi:'Túi rác có phí',e:'🛍️',cat:'종량제',bin:'yellow',binTxt:'일반 쓰레기 수거함',tip:'마트에서 구입, 규격 봉투만 | Mua ở siêu thị'},
+];
+
+const MODAL = {
+  '종량제':{title:'🛍️ 종량제 봉투',body:`<div class="modal-tip">마트, 편의점에서 구입 가능<br>크기: 3L ~ 50L / 가격: 100~500원<br><br><span style="color:#1aaf5d">✓</span> 반드시 규격 봉투 사용<br><span style="color:var(--color-text-danger)">✗</span> 일반 비닐 사용 시 과태료</div>`},
+  '음식물':{title:'🍃 음식물 쓰레기',body:`<div class="modal-tip"><b>가능:</b> 밥, 반찬, 과일 껍질<br><b>불가:</b> 뼈, 껍데기, 복숭아씨<br><br><span style="color:#1aaf5d">✓</span> 물기 최대한 제거<br><span style="color:#1aaf5d">✓</span> 전용 용기/봉투 사용</div>`},
+  '플라스틱':{title:'🧴 플라스틱',body:`<div class="modal-tip"><b>가능:</b> 페트병, 플라스틱 용기<br><b>불가:</b> 오염된 플라스틱<br><br><span style="color:#1aaf5d">✓</span> 내용물 비우고 세척<br><span style="color:#1aaf5d">✓</span> 뚜껑 분리 배출</div>`},
+  '종이':{title:'📦 종이/박스',body:`<div class="modal-tip"><b>가능:</b> 신문지, 박스, 종이컵<br><b>불가:</b> 영수증, 코팅지<br><br><span style="color:#1aaf5d">✓</span> 테이프, 스테이플러 제거<br><span style="color:#1aaf5d">✓</span> 납작하게 접어 배출</div>`},
+  '유리':{title:'🍶 유리',body:`<div class="modal-tip"><b>가능:</b> 유리병, 음료수병<br><b>불가:</b> 깨진 유리, 거울<br><br><span style="color:#1aaf5d">✓</span> 뚜껑 분리, 세척<br><span style="color:var(--color-text-danger)">⚠️</span> 깨진 유리 → 신문지에 싸서 일반쓰레기</div>`},
+  '금속':{title:'🥫 금속/캔',body:`<div class="modal-tip"><b>가능:</b> 음료캔, 식품캔<br><b>불가:</b> 페인트통, 오염된 캔<br><br><span style="color:#1aaf5d">✓</span> 내용물 비우고 세척<br><span style="color:#1aaf5d">✓</span> 찌그러뜨려 배출</div>`},
+};
+
+const NEARBY = [
+  {name:'아파트 단지 내 수거함',vi:'Thùng rác trong khu chung cư',e:'🏢',dist:'50m',types:'플라스틱, 종이, 캔'},
+  {name:'편의점 앞 재활용함',vi:'Thùng tái chế trước cửa hàng',e:'🏪',dist:'120m',types:'유리, 캔, 페트병'},
+  {name:'주민센터 수거함',vi:'Thùng rác trung tâm cộng đồng',e:'🏛️',dist:'300m',types:'종량제, 음식물, 재활용'},
+  {name:'마트 내 분리수거함',vi:'Thùng phân loại trong siêu thị',e:'🏬',dist:'450m',types:'건전지, 형광등, 폐가전'},
+];
+
+function handleImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('previewImg');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('analyzeBtn').style.display = 'block';
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeWaste() {
+  const img = document.getElementById('previewImg');
+  if (!img.src) return;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('analyzeBtn').style.display = 'none';
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+
+  try {
+    const b64 = img.src.split(',')[1];
+    const mime = img.src.split(';')[0].split(':')[1] || 'image/jpeg';
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            {type:'image', source:{type:'base64', media_type:mime, data:b64}},
+            {type:'text', text:`이 사진의 쓰레기를 한국 분리수거 기준으로 분류해주세요. JSON만 응답:
+{"icon":"이모지","title":"한국어명 / Tên tiếng Việt","sub":"분류설명 • Mô tả","binColor":"blue|green|yellow|red","binText":"수거함이름","tip":"방법 | Cách bỏ"}`}
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const txt = data.content[0].text.replace(/\`\`\`json|\`\`\`/g,'').trim();
+    const r = JSON.parse(txt);
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('rIcon').textContent = r.icon;
+    document.getElementById('rTitle').textContent = r.title;
+    document.getElementById('rSub').textContent = r.sub;
+    document.getElementById('rBins').innerHTML = `<span class="bin-tag bin-${r.binColor}">${r.binText}</span>`;
+    document.getElementById('rTip').textContent = r.tip;
+    document.getElementById('resultCard').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('analyzeBtn').style.display = 'block';
+    const eb = document.getElementById('errorBox');
+    eb.textContent = '⚠️ 분석 실패 — 다시 시도해주세요 | Phân tích thất bại, thử lại!';
+    eb.style.display = 'block';
+  }
+}
+
+function renderList(items) {
+  const c = document.getElementById('searchResults');
+  if (!items.length) { c.innerHTML = '<p style="text-align:center;color:var(--color-text-secondary);padding:24px;font-size:14px">결과 없음 / Không có kết quả 😅</p>'; return; }
+  c.innerHTML = items.map(w => `
+    <div class="waste-card" onclick="showWasteModal('${w.name}')">
+      <div class="waste-emoji">${w.e}</div>
+      <div class="waste-info">
+        <h3>${lang==='vi'?w.vi:w.name}</h3>
+        <p><span class="bin-tag bin-${w.bin}" style="padding:2px 8px;font-size:11px">${w.binTxt}</span></p>
+      </div>
+    </div>`).join('');
+}
+
+function searchWaste(q) {
+  let f = DB;
+  if (cat !== 'all') f = f.filter(w => w.cat === cat);
+  if (q.trim()) f = f.filter(w => w.name.includes(q) || w.vi.toLowerCase().includes(q.toLowerCase()));
+  renderList(f);
+}
+
+function filterCat(c, el) {
+  cat = c;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  searchWaste(document.getElementById('searchInput').value);
+}
+
+function showWasteModal(name) {
+  const w = DB.find(x => x.name === name);
+  if (!w) return;
+  document.getElementById('modalTitle').textContent = `${w.e} ${w.name} / ${w.vi}`;
+  document.getElementById('modalContent').innerHTML = `<div class="modal-tip">${w.tip}</div><span class="bin-tag bin-${w.bin}">${w.binTxt}</span>`;
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function findNearby() {
+  document.getElementById('mapList').innerHTML = NEARBY.map(p => `
+    <div class="map-item">
+      <div class="map-dot">${p.e}</div>
+      <div class="map-info"><h3>${lang==='vi'?p.vi:p.name}</h3><p>${p.types}</p></div>
+      <span class="dist-badge">${p.dist}</span>
+    </div>`).join('');
+}
+
+function showModal(key) {
+  const m = MODAL[key];
+  if (!m) return;
+  document.getElementById('modalTitle').textContent = m.title;
+  document.getElementById('modalContent').innerHTML = m.body;
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target===document.getElementById('modalBg')) {
+    document.getElementById('modalBg').classList.remove('open');
+  }
+}
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if (id === 'search') renderList(DB);
+}
+
+function toggleLang() {
+  lang = lang === 'ko' ? 'vi' : 'ko';
+  document.getElementById('langBtn').textContent = lang === 'vi' ? '🇰🇷 한국어' : '🇻🇳 Tiếng Việt';
+  document.querySelectorAll('.t-txt').forEach(el => {
+    el.textContent = lang === 'vi' ? el.dataset.vi : el.dataset.ko;
+  });
+  const si = document.getElementById('searchInput');
+  if (si) si.placeholder = lang === 'vi' ? 'Tìm kiếm...' : '예: 페트병, 음식물...';
+  if (document.getElementById('tab-search').classList.contains('active')) renderList(DB);
+}
+
+renderList(DB);
+</script>
