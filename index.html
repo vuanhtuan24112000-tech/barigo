@@ -706,7 +706,7 @@ async function analyzeWaste() {
   document.getElementById('loading').style.display = 'block';
   document.getElementById('analyzeBtn').style.display = 'none';
   document.getElementById('resultCard').style.display = 'none';
-  document.getElementById('errorBox').style.display = 'none';
+  const eb2 = document.getElementById('errorBox'); if(eb2) eb2.style.display = 'none';
   try {
     const b64 = img.src.split('base64,')[1];
     const mime = img.src.split(';')[0].split(':')[1] || 'image/jpeg';
@@ -737,8 +737,8 @@ async function analyzeWaste() {
     console.error('Error:', e);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('analyzeBtn').style.display = 'block';
-    document.getElementById('errorBox').textContent = '⚠️ 분석 실패 | Thử lại!';
-    document.getElementById('errorBox').style.display = 'block';
+    const eb3 = document.getElementById('errorBox'); if(eb3) { eb3.textContent = '⚠️ 분석 실패 | Thử lại!'; eb3.style.display = 'block'; }
+    
   }
 }
 
