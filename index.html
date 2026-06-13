@@ -702,80 +702,43 @@ function handleImage(input) {
 
 async function analyzeWaste() {
   const img = document.getElementById('previewImg');
-  if (!img.src) return;
-
+  if (!img.src || img.src === window.location.href) return;
   document.getElementById('loading').style.display = 'block';
   document.getElementById('analyzeBtn').style.display = 'none';
   document.getElementById('resultCard').style.display = 'none';
-
+  document.getElementById('errorBox').style.display = 'none';
   try {
-    // Convert image to base64
-    const response = await fetch(img.src);
-    const blob = await response.blob();
-    const base64 = await new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.readAsDataURL(blob);
-    });
-
-    // Call Anthropic API
-    const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    const b64 = img.src.split('base64,')[1];
+    const mime = img.src.split(';')[0].split(':')[1] || 'image/jpeg';
+    const apiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AQ.Ab8RN6l3lYfiK6ejonnL3q09G_gK-MbKTS1swZTTh31N9bk3Jw', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: blob.type || 'image/jpeg', data: base64 }
-            },
-            {
-              type: 'text',
-              text: `이 사진에 있는 쓰레기를 분석해서 한국 분리수거 기준으로 분류해주세요.
-반드시 JSON 형식으로만 응답하세요:
-{
-  "icon": "이모지",
-  "title": "한국어 이름 / Tên tiếng Việt",
-  "sub": "분류 설명 • Mô tả phân loại",
-  "binColor": "blue 또는 green 또는 yellow 또는 red",
-  "binText": "버려야 할 수거함 이름",
-  "tip": "배출 방법 | Cách bỏ rác"
-}
-binColor 기준: 재활용=blue, 음식물=green, 종량제=yellow, 일반쓰레기=red`
-            }
+        contents: [{
+          parts: [
+            {inline_data: {mime_type: mime, data: b64}},
+            {text: '이 사진의 쓰레기를 한국 분리수거 기준으로 분류해주세요. JSON만 응답: {"icon":"이모지","title":"한국어명 / Tên tiếng Việt","sub":"분류설명","binColor":"blue또는green또는yellow또는red","binText":"수거함이름","tip":"방법 | Cách bỏ"}'}
           ]
         }]
       })
     });
-
     const data = await apiResponse.json();
-    const text = data.content[0].text;
-    const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim();
-    const result = JSON.parse(clean);
-
+    if (!data.candidates || !data.candidates[0]) throw new Error(JSON.stringify(data));
+    const txt = data.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const r = JSON.parse(txt);
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('resultIcon').textContent = result.icon;
-    document.getElementById('resultTitle').textContent = result.title;
-    document.getElementById('resultSub').textContent = result.sub;
-    document.getElementById('resultBins').innerHTML =
-      `<span class="bin-tag bin-${result.binColor}">${result.binText}</span>`;
-    document.getElementById('resultTip').textContent = result.tip;
+    document.getElementById('rIcon').textContent = r.icon || '♻️';
+    document.getElementById('rTitle').textContent = r.title || '';
+    document.getElementById('rSub').textContent = r.sub || '';
+    document.getElementById('rBins').innerHTML = '<span class="bin-tag bin-'+(r.binColor||'blue')+'">'+(r.binText||'')+'</span>';
+    document.getElementById('rTip').textContent = r.tip || '';
     document.getElementById('resultCard').style.display = 'block';
-
-  } catch(err) {
-    console.error(err);
-    // Fallback nếu API lỗi
+  } catch(e) {
+    console.error('Error:', e);
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('resultIcon').textContent = '⚠️';
-    document.getElementById('resultTitle').textContent = '분석 실패 / Phân tích thất bại';
-    document.getElementById('resultSub').textContent = '다시 시도해주세요 • Vui lòng thử lại';
-    document.getElementById('resultBins').innerHTML = '';
-    document.getElementById('resultTip').textContent = '인터넷 연결을 확인하세요 | Kiểm tra kết nối internet';
-    document.getElementById('resultCard').style.display = 'block';
     document.getElementById('analyzeBtn').style.display = 'block';
+    document.getElementById('errorBox').textContent = '⚠️ 분석 실패 | Thử lại!';
+    document.getElementById('errorBox').style.display = 'block';
   }
 }
 
